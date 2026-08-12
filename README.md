@@ -1,24 +1,137 @@
-# README
+# FURIMA
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+フリーマーケットアプリケーションです。
 
-Things you may want to cover:
+## 実装機能と使用テーブル
 
-* Ruby version
+| 機能 | 使用テーブル | 保存する情報 |
+|------|--------------|--------------|
+| ユーザー管理 | users | ログイン情報、氏名、生年月日 |
+| 商品出品 | items | 商品情報、価格、配送条件、出品者 |
+| 商品購入 | orders | 購入者と購入商品 |
+| 配送先登録 | addresses | 購入商品の配送先 |
 
-* System dependencies
+## ER図
 
-* Configuration
+```mermaid
+erDiagram
+  USERS ||--o{ ITEMS : sells
+  USERS ||--o{ ORDERS : purchases
+  ITEMS ||--o| ORDERS : has
+  ORDERS ||--|| ADDRESSES : has
 
-* Database creation
+  USERS {
+    bigint id PK
+    string nickname
+    string email UK
+    string encrypted_password
+    string last_name
+    string first_name
+    string last_name_kana
+    string first_name_kana
+    date birth_date
+  }
 
-* Database initialization
+  ITEMS {
+    bigint id PK
+    string name
+    text description
+    integer category_id
+    integer condition_id
+    integer shipping_fee_id
+    integer prefecture_id
+    integer shipping_day_id
+    integer price
+    bigint user_id FK
+  }
 
-* How to run the test suite
+  ORDERS {
+    bigint id PK
+    bigint user_id FK
+    bigint item_id FK
+  }
 
-* Services (job queues, cache servers, search engines, etc.)
+  ADDRESSES {
+    bigint id PK
+    string postal_code
+    integer prefecture_id
+    string city
+    string house_number
+    string building_name
+    string phone_number
+    bigint order_id FK
+  }
+```
 
-* Deployment instructions
+## usersテーブル
 
-* ...
+| Column             | Type   | Options                   |
+|--------------------|--------|---------------------------|
+| nickname           | string | null: false               |
+| email              | string | null: false, unique: true |
+| encrypted_password | string | null: false               |
+| last_name          | string | null: false               |
+| first_name         | string | null: false               |
+| last_name_kana     | string | null: false               |
+| first_name_kana    | string | null: false               |
+| birth_date         | date   | null: false               |
+
+### Association
+
+- has_many :items
+- has_many :orders
+
+## itemsテーブル
+
+| Column          | Type       | Options                        |
+|-----------------|------------|--------------------------------|
+| name            | string     | null: false                    |
+| description     | text       | null: false                    |
+| category_id     | integer    | null: false                    |
+| condition_id    | integer    | null: false                    |
+| shipping_fee_id | integer    | null: false                    |
+| prefecture_id   | integer    | null: false                    |
+| shipping_day_id | integer    | null: false                    |
+| price           | integer    | null: false                    |
+| user            | references | null: false, foreign_key: true |
+
+### Association
+
+- belongs_to :user
+- has_one :order
+
+## ordersテーブル
+
+| Column | Type       | Options                        |
+|--------|------------|--------------------------------|
+| user   | references | null: false, foreign_key: true |
+| item   | references | null: false, foreign_key: true |
+
+### Association
+
+- belongs_to :user
+- belongs_to :item
+- has_one :address
+
+## addressesテーブル
+
+| Column        | Type       | Options                        |
+|---------------|------------|--------------------------------|
+| postal_code   | string     | null: false                    |
+| prefecture_id | integer    | null: false                    |
+| city          | string     | null: false                    |
+| house_number  | string     | null: false                    |
+| building_name | string     |                                |
+| phone_number  | string     | null: false                    |
+| order         | references | null: false, foreign_key: true |
+
+### Association
+
+- belongs_to :order
+
+## 設計方針
+
+- 商品画像はActive Storageで管理するため、itemsテーブルには画像用カラムを設けません。
+- カテゴリー、商品の状態、配送料の負担、発送元の地域、発送までの日数はActive Hashで管理します。
+- 購入記録と配送先情報は責務が異なるため、ordersテーブルとaddressesテーブルに分離します。
+- 建物名だけは入力任意とし、それ以外のユーザー入力項目は必須とします。
