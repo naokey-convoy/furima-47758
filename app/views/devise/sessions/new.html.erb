@@ -1,0 +1,11 @@
+<div class="account-page">
+  <h1>ログイン</h1>
+
+  <%= form_with model: resource, as: resource_name, url: session_path(resource_name), local: true do |f| %>
+    <div class="field"><%= f.label :email, "メールアドレス" %><%= f.email_field :email, autofocus: true, autocomplete: "email" %></div>
+    <div class="field"><%= f.label :password, "パスワード" %><%= f.password_field :password, autocomplete: "current-password" %></div>
+    <div class="actions"><%= f.submit "ログイン" %></div>
+  <% end %>
+
+  <%= render "devise/shared/links" %>
+</div>
