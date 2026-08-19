@@ -25,3 +25,4 @@ document.addEventListener("input", (event) => {
 })
 
 document.addEventListener("turbo:load", updatePriceDetails)
+document.addEventListener("turbo:render", updatePriceDetails)
