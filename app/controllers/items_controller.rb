@@ -1,7 +1,7 @@
 class ItemsController < ApplicationController
-  before_action :authenticate_user!, only: [ :new, :create, :destroy ]
-  before_action :set_item, only: [ :show, :destroy ]
-  before_action :authorize_owner!, only: [ :destroy ]
+  before_action :authenticate_user!, only: [ :new, :create, :edit, :update, :destroy ]
+  before_action :set_item, only: [ :show, :edit, :update, :destroy ]
+  before_action :authorize_owner!, only: [ :edit, :update, :destroy ]
 
   def index
     @items = Item.includes(:user, image_attachment: :blob).order(created_at: :desc)
@@ -21,6 +21,17 @@ class ItemsController < ApplicationController
       redirect_to root_path
     else
       render :new, status: :unprocessable_entity
+    end
+  end
+
+  def edit
+  end
+
+  def update
+    if @item.update(item_params)
+      redirect_to item_path(@item)
+    else
+      render :edit, status: :unprocessable_entity
     end
   end
 
