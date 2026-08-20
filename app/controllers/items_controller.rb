@@ -1,12 +1,13 @@
 class ItemsController < ApplicationController
-  before_action :authenticate_user!, only: [ :new, :create ]
+  before_action :authenticate_user!, only: [ :new, :create, :edit, :update ]
+  before_action :set_item, only: [ :show, :edit, :update ]
+  before_action :authorize_owner!, only: [ :edit, :update ]
 
   def index
     @items = Item.includes(:user, image_attachment: :blob).order(created_at: :desc)
   end
 
   def show
-    @item = Item.find(params[:id])
   end
 
   def new
@@ -23,7 +24,26 @@ class ItemsController < ApplicationController
     end
   end
 
+  def edit
+  end
+
+  def update
+    if @item.update(item_params)
+      redirect_to item_path(@item)
+    else
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
   private
+
+  def set_item
+    @item = Item.find(params[:id])
+  end
+
+  def authorize_owner!
+    redirect_to root_path unless current_user == @item.user
+  end
 
   def item_params
     params.require(:item).permit(
