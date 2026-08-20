@@ -1,12 +1,13 @@
 class ItemsController < ApplicationController
-  before_action :authenticate_user!, only: [ :new, :create ]
+  before_action :authenticate_user!, only: [ :new, :create, :destroy ]
+  before_action :set_item, only: [ :show, :destroy ]
+  before_action :authorize_owner!, only: [ :destroy ]
 
   def index
     @items = Item.includes(:user, image_attachment: :blob).order(created_at: :desc)
   end
 
   def show
-    @item = Item.find(params[:id])
   end
 
   def new
@@ -23,7 +24,20 @@ class ItemsController < ApplicationController
     end
   end
 
+  def destroy
+    @item.destroy
+    redirect_to root_path
+  end
+
   private
+
+  def set_item
+    @item = Item.find(params[:id])
+  end
+
+  def authorize_owner!
+    redirect_to root_path unless current_user == @item.user
+  end
 
   def item_params
     params.require(:item).permit(
