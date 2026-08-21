@@ -1,6 +1,16 @@
 const buildCardForm = () => {
   const form = document.getElementById("charge-form")
-  if (!form || form.dataset.cardReady === "true" || typeof Payjp === "undefined") return
+  if (!form || form.dataset.cardReady === "true") return
+
+  const errorMessage = document.getElementById("card-error-message")
+  if (!form.dataset.payjpPublicKey) {
+    errorMessage.textContent = "PAY.JPの公開鍵が設定されていません"
+    return
+  }
+  if (typeof Payjp === "undefined") {
+    errorMessage.textContent = "カード入力機能を読み込めませんでした。ページを再読み込みしてください"
+    return
+  }
 
   const payjp = Payjp(form.dataset.payjpPublicKey)
   const elements = payjp.elements()
@@ -19,6 +29,7 @@ const buildCardForm = () => {
 
     payjp.createToken(numberElement).then((response) => {
       if (response.error) {
+        errorMessage.textContent = response.error.message
         form.querySelector("button, input[type='submit']").disabled = false
         return
       }

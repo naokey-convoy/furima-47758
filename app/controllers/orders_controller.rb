@@ -35,7 +35,11 @@ class OrdersController < ApplicationController
   end
 
   def pay_item
-    Payjp.api_key = ENV["PAYJP_SECRET_KEY"]
+    Payjp.api_key = payjp_secret_key
     Payjp::Charge.create(amount: @item.price, card: order_params[:token], currency: "jpy")
+  end
+
+  def payjp_secret_key
+    ENV["PAYJP_SECRET_KEY"].presence || Rails.application.credentials.dig(:payjp, :secret_key)
   end
 end

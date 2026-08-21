@@ -23,11 +23,13 @@
 
     <%= form_with model: @order_address, url: item_orders_path(@item), id: "charge-form",
                   class: "transaction-form-wrap", local: true,
-                  data: { payjp_public_key: ENV["PAYJP_PUBLIC_KEY"] } do |f| %>
+                  data: { payjp_public_key: ENV["PAYJP_PUBLIC_KEY"].presence ||
+                                            Rails.application.credentials.dig(:payjp, :public_key) } do |f| %>
       <%= render "shared/error_messages", model: f.object %>
 
       <div class="credit-card-form">
         <h1 class="info-input-haedline">クレジットカード情報入力</h1>
+        <p id="card-error-message" class="card-error-message"></p>
         <div class="form-group">
           <div class="form-text-wrap">
             <label class="form-text">カード情報</label>
