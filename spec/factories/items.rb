@@ -12,7 +12,7 @@ FactoryBot.define do
 
     after(:build) do |item|
       item.image.attach(
-        io: StringIO.new('dummy image data'),
+        io: File.open(Rails.root.join('public/apple-touch-icon.png')),
         filename: 'test_image.png',
         content_type: 'image/png'
       )

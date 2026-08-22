@@ -1,7 +1,21 @@
 require "rails_helper"
 
 RSpec.describe OrderAddress, type: :model do
-  subject(:order_address) { FactoryBot.build(:order_address) }
+  before(:context) do
+    @user = FactoryBot.create(:user)
+    @item = FactoryBot.create(:item, user: @user)
+  end
+
+  before do
+    @order_address = FactoryBot.build(:order_address, user_id: @user.id, item_id: @item.id)
+  end
+
+  after(:context) do
+    @item.destroy!
+    @user.destroy!
+  end
+
+  subject(:order_address) { @order_address }
 
   describe "商品購入情報の保存" do
     context "保存できる場合" do
