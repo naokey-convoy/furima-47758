@@ -32,6 +32,7 @@ gem "jbuilder"
 # User authentication
 gem "devise"
 gem "active_hash"
+gem "payjp"
 
 # Use Redis adapter to run Action Cable in production
 # gem "redis", ">= 4.0.1"

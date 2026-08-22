@@ -2,9 +2,10 @@ class ItemsController < ApplicationController
   before_action :authenticate_user!, only: [ :new, :create, :edit, :update, :destroy ]
   before_action :set_item, only: [ :show, :edit, :update, :destroy ]
   before_action :authorize_owner!, only: [ :edit, :update, :destroy ]
+  before_action :ensure_item_unsold, only: [ :edit, :update ]
 
   def index
-    @items = Item.includes(:user, image_attachment: :blob).order(created_at: :desc)
+    @items = Item.includes(:user, :order, image_attachment: :blob).order(created_at: :desc)
   end
 
   def show
@@ -48,6 +49,10 @@ class ItemsController < ApplicationController
 
   def authorize_owner!
     redirect_to root_path unless current_user == @item.user
+  end
+
+  def ensure_item_unsold
+    redirect_to root_path if @item.order.present?
   end
 
   def item_params

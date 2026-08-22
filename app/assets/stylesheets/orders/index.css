@@ -95,6 +95,12 @@
   font-size: 20px;
 }
 
+.card-error-message {
+  color: #ea352d;
+  margin-top: 10px;
+  text-align: center;
+}
+
 .available-card {
   display: flex;
   height: 35px;
